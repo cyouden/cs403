@@ -1,3 +1,4 @@
+#!/usr/bin/ruby-rvm-env 1.9.3
 require 'sqlite3'
 
 db = SQLite3::Database.new("wine.db")
@@ -10,19 +11,18 @@ end
 
 print("Enter the attributes of a new wine:\n")
 print("Name: ")
-$name = gets.chomp
+name = gets.chomp
 print("Price: ")
-$price = gets.chomp
+price = gets.chomp
 print("Date Purchased: ")
-$purch_date = gets.chomp
+purch_date = gets.chomp
 print("Date Drunk: ")
-$drunk_date = gets.chomp
+drunk_date = gets.chomp
 print("Rating: ")
-$rating = gets.chomp
+rating = gets.chomp
 print("Comment: ")
-$comment = gets.chomp
+comment = gets.chomp
 
 db.execute(
-	sprintf(
-            'INSERT INTO wine (name, price, purchase_date, drunk_date, rating, comment) VALUES ("%s", "%s", "%s", "%s", "%s", "%s")',
-			$name, $price, $purch_date, $drunk_date, $rating, $comment))
+	'INSERT INTO wine (name, price, purchase_date, drunk_date, rating, comment) VALUES (?, ?, ?, ?, ?, ?)',
+	name, price, purch_date, drunk_date, rating, comment)

@@ -9,9 +9,9 @@ select_queries = Hash[
   "wineries"         => "SELECT winery_name FROM wines_tmp;",
   "vineyards"        => "SELECT vinyard_name, winery_name, region_name FROM wines_tmp;",
   "grapes"           => "SELECT grape_name FROM wines_tmp;", 
-  "grapes_vineyards" => "SELECT grape_name FROM wines_tmp;",
-  "wines"            => "SELECT grape_name FROM wines_tmp;",
-  "grapes_wines"     => "SELECT grape_name FROM wines_tmp;"
+  "grapes_vineyards" => "SELECT grape_name, vinyard_name FROM wines_tmp;",
+  "wines"            => "SELECT * FROM wines_tmp;",
+  "grapes_wines"     => "SELECT grape_name, name FROM wines_tmp;"
 ]
 
 insert_queries = Hash[

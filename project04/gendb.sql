@@ -43,7 +43,7 @@ CREATE TABLE wines (
   sku TEXT UNIQUE,
   name TEXT,
   purchase_date TEXT,
-  date_drunk TEXT,
+  drunk_date TEXT,
   rating INTEGER,
   comment TEXT,
   price REAL,

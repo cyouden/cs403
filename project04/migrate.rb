@@ -3,17 +3,6 @@ require 'set'
 
 query_wines_tmp = "SELECT * FROM wines_tmp;"
 
-select_queries = Hash[
-  "countries"        => "SELECT country_name FROM wines_tmp;",
-  "regions"          => "SELECT country_name, region_name FROM wines_tmp", 
-  "wineries"         => "SELECT winery_name FROM wines_tmp;",
-  "vineyards"        => "SELECT vinyard_name, winery_name, region_name FROM wines_tmp;",
-  "grapes"           => "SELECT grape_name FROM wines_tmp;", 
-  "grapes_vineyards" => "SELECT grape_name, vinyard_name FROM wines_tmp;",
-  "wines"            => "SELECT * FROM wines_tmp;",
-  "grapes_wines"     => "SELECT grape_name, name FROM wines_tmp;"
-]
-
 insert_queries = Hash[
   "countries"        => "INSERT INTO countries (name) VALUES (?);",
   "regions"          => "INSERT INTO regions (name, country_id) VALUES (?, (SELECT id FROM countries WHERE name=?));", 
@@ -28,14 +17,14 @@ insert_queries = Hash[
 db = SQLite3::Database.new("wine04.db")
 db.results_as_hash = true
 
+query_result = db.execute(query_wines_tmp);
+
 # General pattern: add results to sets to remove duplicates, add sets to database
 
 # Countries
-countries_query_result = db.execute(select_queries["countries"])
-
 countries_set = Set[];
 
-countries_query_result.each do |row|
+query_result.each do |row|
   countries_set.add(row["country_name"])
 end
   
@@ -44,11 +33,9 @@ countries_set.each do |item|
 end
 
 #Regions
-regions_query_result = db.execute(select_queries["regions"])
-
 regions_set = Set[];
 
-regions_query_result.each do |row|
+query_result.each do |row|
   regions_set.add("#{row["region_name"]}|#{row["country_name"]}")
 end
 
@@ -60,11 +47,9 @@ regions_set.each do |item|
 end
 
 #Wineries
-wineries_query_result = db.execute(select_queries["wineries"])
-
 wineries_set = Set[];
 
-wineries_query_result.each do |row|
+query_result.each do |row|
   wineries_set.add(row["winery_name"])
 end
 
@@ -73,11 +58,9 @@ wineries_set.each do |item|
 end
 
 #Vineyards
-vineyards_query_result = db.execute(select_queries["vineyards"])
-
 vineyards_set = Set[];
 
-vineyards_query_result.each do |row|
+query_result.each do |row|
   vineyards_set.add("#{row["vinyard_name"]}|#{row["winery_name"]}|#{row["region_name"]}")
 end
 
@@ -89,11 +72,9 @@ vineyards_set.each do |item|
 end
 
 #Grapes
-grapes_query_result = db.execute(select_queries["grapes"])
-
 grapes_set = Set[];
 
-grapes_query_result.each do |row|
+query_result.each do |row|
   split = row["grape_name"].split(", ")
   
   split.each do |substr|
@@ -103,6 +84,37 @@ end
 
 grapes_set.each do |item|
   db.execute(insert_queries["grapes"], item)
+end
+
+#Grapes_Vineyards
+grapes_vineyards_set = Set[];
+
+query_result.each do |row|
+  split = row["grape_name"].split(", ")
+  
+  split.each do |substr|
+    grapes_vineyards_set.add("#{substr}|#{row["vinyard_name"]}")
+  end
+end
+
+grapes_vineyards_set.each do |item|
+  split = item.split("|")
+  db.execute(insert_queries["grapes_vineyards"], split[0], split[1])
+end
+
+#Wines + Grapes_Wines
+query_result.each do |row|
+  if row["price"] == "free"
+    row["price"] = 0
+  end
+  
+  db.execute(insert_queries["wines"], row["name"], row["purchase_date"], row["drunk_date"], row["rating"], row["comment"], row["price"], row["vintage"], row["winery_name"])
+  
+  split = row["grape_name"].split(", ")
+  
+  split.each do |substr|  
+    db.execute(insert_queries["grapes_wines"], substr, row["name"])
+  end
 end
   
 db.close()

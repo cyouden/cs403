@@ -1,0 +1,47 @@
+Christopher Youden, CSCI403
+Project 06
+
+This is my working directory for creating a database-backed application using an ORM.
+This application will devour the souls of your enemies [subject to change without notice]
+
+Zoo
+    id int
+    name varchar(255)
+    
+Location
+    id int
+    name varchar(255)
+    
+Habitat
+    id int
+    zoo_id int
+    locations_id int
+    name varchar(255)
+    capacity int
+    description text
+    
+Animal
+    id int
+    habitat_id int
+    name varchar(255)
+    description text
+    cuteness int
+    
+User
+    id int
+    username varchar(255)
+    password varchar(255)
+    
+animals_users
+    animal_id int
+    user_id int
+    
+Feed
+    id int
+    name varchar(255)
+    delicious enum('yes', 'no')
+    
+animals_feeds
+    animal_id int
+    feed_id int
+    
